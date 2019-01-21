@@ -1,9 +1,10 @@
 ﻿using Apache.NMS;
 using System;
+using Newtonsoft.Json;
 
 namespace ActiveMQ.Consumer
 {
-    [Serializable]
+    
     public class Person
     {
         public string FirstName { get; set; }
@@ -30,7 +31,7 @@ namespace ActiveMQ.Consumer
             // Read all messages off the queue
             while (ReadNextMessageTopic())
             {
-                Console.WriteLine("Successfully read message ");
+                //Console.WriteLine("Successfully read message ");
             }
 
             Console.WriteLine("Finished");
@@ -51,25 +52,9 @@ namespace ActiveMQ.Consumer
                     {
                         ITextMessage txtMsg = msg as ITextMessage;
                         string body = txtMsg.Text;
+                        Person person = JsonConvert.DeserializeObject<Person>(body);
 
-                        Console.WriteLine($"Received message: {txtMsg.Text}");
-
-                        return true;
-                    }
-                    if (msg is IObjectMessage)
-                    {
-                        IObjectMessage objectMessage = msg as IObjectMessage;
-                        if (objectMessage != null)
-                        {
-                            Person person = objectMessage.Body as Person;
-                            if (person != null)
-                            {
-
-                                Console.WriteLine($"Received message: {person.FirstName}");
-
-                            }
-                        }
-
+                        Console.WriteLine($"Received message : {person.FirstName } {person.LastName } ");
                         return true;
                     }
                     else
@@ -97,25 +82,9 @@ namespace ActiveMQ.Consumer
                     {
                         ITextMessage txtMsg = msg as ITextMessage;
                         string body = txtMsg.Text;
-                        Console.WriteLine($"Received message: {txtMsg.Text}");
+                        Person person = JsonConvert.DeserializeObject<Person>(body);
 
-                        return true;
-                    }
-                    else
-                    if (msg is IObjectMessage)
-                    {
-                        IObjectMessage objectMessage = msg as IObjectMessage;
-                        if (objectMessage != null)
-                        {
-                            Person person = objectMessage.Body as Person;
-                            if (person != null)
-                            {
-
-                                Console.WriteLine($"Received message: {person.FirstName}");
-
-                            }
-                        }
-
+                        Console.WriteLine($"Received message : {person.FirstName } {person.LastName } ");
                         return true;
                     }
                     else
