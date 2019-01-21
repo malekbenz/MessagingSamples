@@ -1,9 +1,18 @@
 ﻿using Apache.NMS;
 using System;
+using System.IO;
 using System.Threading;
+using System.Xml.Serialization;
 
 namespace ActiveMQ.Producer
 {
+    [Serializable]
+    public class Person
+    {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+
+    }
     class Program
     {
         static string user = "admin";
@@ -22,12 +31,19 @@ namespace ActiveMQ.Producer
         {
             for (int i = 0; i < 1000; i++)
             {
-                SendNewMessageQueue($"Sent {text} messages -  {i}");
+                var person = new Person
+                {
+                    FirstName = $"malek {i}",
+                    LastName = $"benzemam  {i}"
+                };
+                SendNewMessageQueue(person);
+                SendNewMessageTopic(person);
+
                 Thread.Sleep(1000);
             }
 
         }
-        private static void SendNewMessageQueue(string text)
+        private static void SendNewMessageQueue(Person message)
         {
             using (IConnection connection = factory.CreateConnection(user, password))
             {
@@ -38,13 +54,15 @@ namespace ActiveMQ.Producer
                 using (IMessageProducer producer = session.CreateProducer(dest))
                 {
                     producer.DeliveryMode = MsgDeliveryMode.NonPersistent;
-                    producer.Send(session.CreateTextMessage(text));
-                    Console.WriteLine($"Sent : {text} ");
+                    //producer.Send(session.CreateTextMessage(text));
+                    producer.Send(session.CreateObjectMessage(message));
+                    Console.WriteLine($"Sent : {message.FirstName } {message.LastName } ");
                 }
             }
-            
+
         }
-        private static void SendNewMessageTopic(string text)
+
+        private static void SendNewMessageTopic(Person message)
         {
             using (IConnection connection = factory.CreateConnection(user, password))
             {
@@ -55,9 +73,21 @@ namespace ActiveMQ.Producer
                 using (IMessageProducer producer = session.CreateProducer(dest))
                 {
                     producer.DeliveryMode = MsgDeliveryMode.NonPersistent;
-                    producer.Send(session.CreateTextMessage(text));
-                    Console.WriteLine($"Sent : {text} ");
+                    //producer.Send(session.CreateTextMessage(text));
+                    producer.Send(session.CreateObjectMessage(message));
+                    Console.WriteLine($"Sent : {message.FirstName } {message.LastName } ");
                 }
+            }
+        }
+
+        public static string SerializeObject<T>(this T toSerialize)
+        {
+            XmlSerializer xmlSerializer = new XmlSerializer(toSerialize.GetType());
+
+            using (StringWriter textWriter = new StringWriter())
+            {
+                xmlSerializer.Serialize(textWriter, toSerialize);
+                return textWriter.ToString();
             }
         }
     }

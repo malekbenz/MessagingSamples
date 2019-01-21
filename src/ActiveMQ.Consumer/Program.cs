@@ -3,6 +3,14 @@ using System;
 
 namespace ActiveMQ.Consumer
 {
+    [Serializable]
+    public class Person
+    {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+
+    }
+
     class Program
     {
         static string user = "admin";
@@ -20,9 +28,9 @@ namespace ActiveMQ.Consumer
             Console.WriteLine("Waiting for messages");
 
             // Read all messages off the queue
-            while (ReadNextMessageQueue())
+            while (ReadNextMessageTopic())
             {
-                Console.WriteLine("Successfully read message");
+                Console.WriteLine("Successfully read message ");
             }
 
             Console.WriteLine("Finished");
@@ -48,6 +56,22 @@ namespace ActiveMQ.Consumer
 
                         return true;
                     }
+                    if (msg is IObjectMessage)
+                    {
+                        IObjectMessage objectMessage = msg as IObjectMessage;
+                        if (objectMessage != null)
+                        {
+                            Person person = objectMessage.Body as Person;
+                            if (person != null)
+                            {
+
+                                Console.WriteLine($"Received message: {person.FirstName}");
+
+                            }
+                        }
+
+                        return true;
+                    }
                     else
                     {
                         Console.WriteLine("Unexpected message type: " + msg.GetType().Name);
@@ -68,11 +92,29 @@ namespace ActiveMQ.Consumer
                 using (IMessageConsumer consumer = session.CreateConsumer(dest))
                 {
                     IMessage msg = consumer.Receive();
+
                     if (msg is ITextMessage)
                     {
                         ITextMessage txtMsg = msg as ITextMessage;
                         string body = txtMsg.Text;
                         Console.WriteLine($"Received message: {txtMsg.Text}");
+
+                        return true;
+                    }
+                    else
+                    if (msg is IObjectMessage)
+                    {
+                        IObjectMessage objectMessage = msg as IObjectMessage;
+                        if (objectMessage != null)
+                        {
+                            Person person = objectMessage.Body as Person;
+                            if (person != null)
+                            {
+
+                                Console.WriteLine($"Received message: {person.FirstName}");
+
+                            }
+                        }
 
                         return true;
                     }
