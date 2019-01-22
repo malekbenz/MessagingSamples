@@ -54,7 +54,8 @@ namespace ActiveMQ.Producer
                 using (IDestination dest = session.GetQueue(Queue))
                 using (IMessageProducer producer = session.CreateProducer(dest))
                 {
-                    producer.DeliveryMode = MsgDeliveryMode.NonPersistent;
+                    producer.DeliveryMode = MsgDeliveryMode.Persistent;
+                    
                     string json = JsonConvert.SerializeObject(message);
                     
                     producer.Send(session.CreateTextMessage(json));
@@ -75,7 +76,7 @@ namespace ActiveMQ.Producer
                 using (IDestination dest = session.GetTopic(topic))
                 using (IMessageProducer producer = session.CreateProducer(dest))
                 {
-                    producer.DeliveryMode = MsgDeliveryMode.NonPersistent;
+                    producer.DeliveryMode = MsgDeliveryMode.Persistent;
                     string json = JsonConvert.SerializeObject(message);
 
                     producer.Send(session.CreateTextMessage(json));

@@ -47,6 +47,7 @@ namespace ActiveMQ.Consumer
                 using (IDestination dest = session.GetQueue(Queue))
                 using (IMessageConsumer consumer = session.CreateConsumer(dest))
                 {
+                    
                     IMessage msg = consumer.Receive();
                     if (msg is ITextMessage)
                     {
